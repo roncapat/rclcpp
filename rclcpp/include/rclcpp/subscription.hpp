@@ -139,7 +139,7 @@ public:
     message_memory_strategy_(message_memory_strategy)
   // *INDENT-ON*
   {
-    // Setup intra process publishing if requested.
+    // Setup intra process subscription if requested.
     if (rclcpp::detail::resolve_use_intra_process(options_, *node_base)) {
       using rclcpp::detail::resolve_intra_process_buffer_type;
 
