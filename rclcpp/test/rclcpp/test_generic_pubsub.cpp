@@ -68,33 +68,21 @@ public:
   std::vector<T1> subscribe_raw_messages(
     size_t expected_recv_msg_count, const std::string & topic_name, const std::string & type)
   {
-    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "begin");
     std::vector<T1> messages;
     size_t counter = 0;
     auto subscription = node_->create_generic_subscription(
       topic_name, type, rclcpp::QoS(1),
       [&counter, &messages, this](const std::shared_ptr<const rclcpp::SerializedMessage> message) {
-        RCLCPP_WARN(rclcpp::get_logger("======================================"), "begin");
         T2 deserialized_message;
         rclcpp::Serialization<T2> serializer;
         serializer.deserialize_message(message.get(), &deserialized_message);
         messages.push_back(this->get_data_from_msg(deserialized_message));
         counter++;
-        RCLCPP_ERROR(rclcpp::get_logger("====================================="), " ");
-        RCLCPP_WARN(rclcpp::get_logger("======================================"), "end");
       });
 
     while (counter < expected_recv_msg_count) {
-      RCLCPP_WARN_THROTTLE(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"),
-        *(this->node_->get_clock()),
-        5000,
-        "spinning...");
-      //rclcpp::spin_some(publisher_node_);
       rclcpp::spin_some(node_);
     }
-    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"),
-      "expected_recv_msg_count reached");
-    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "end");
     return messages;
   }
 
@@ -223,7 +211,6 @@ TEST_F(RclcppGenericNodeFixture, publisher_and_subscriber_intra)
     &success);
   ASSERT_EQ(RCL_RET_OK, ret) << rcl_get_error_string().str;
   ASSERT_TRUE(success);
-  RCLCPP_WARN(rclcpp::get_logger("test"), "out from rcl_wait_for_subscribers");
 
   for (const auto & message : test_messages) {
     auto msg1 = std::make_unique<test_msgs::msg::Strings>();

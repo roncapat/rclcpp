@@ -87,13 +87,8 @@ public:
     any_callback_(callback),
     ts_lib_(ts_lib)
   {
-    RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::GenericSubscription"), "begin");
         // Setup intra process publishing if requested.
     if (rclcpp::detail::resolve_use_intra_process(options, *node_base)) {
-      RCLCPP_WARN(
-        rclcpp::get_logger("GenericSubscription::GenericSubscription"),
-        "intra-process enabled for GenericSubscription"
-      );
       using rclcpp::detail::resolve_intra_process_buffer_type;
 
       // Check if the QoS is compatible with intra-process.
@@ -155,7 +150,6 @@ public:
 #ifndef TRACETOOLS_DISABLED
     any_callback_.register_callback_for_tracing();
 #endif
-    RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::GenericSubscription"), "end");
   }
 
   RCLCPP_PUBLIC
