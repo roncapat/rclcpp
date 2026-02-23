@@ -186,9 +186,6 @@ public:
           }
         }
       });
-    RCLCPP_WARN_THROTTLE(rclcpp::get_logger("WaitSetTemplate::add_subscription"),
-    clock, 2500,
-    "end");
   }
 
   /// Remove a subscription from this wait set.
