@@ -861,7 +861,6 @@ private:
     using SubscribedTypeDeleter = allocator::Deleter<SubscribedTypeAllocator, MessageT>;
 
     for (auto id : subscription_ids) {
-      RCLCPP_WARN_STREAM(
       auto subscription_it = generic_subscriptions_.find(id);
       if (subscription_it == generic_subscriptions_.end()) {
         throw std::runtime_error("subscription has unexpectedly gone out of scope");
