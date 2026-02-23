@@ -575,7 +575,6 @@ protected:
       intra_process_publisher_id_,
       std::move(msg),
       ros_message_type_allocator_);
-    return ret;
   }
 
 
