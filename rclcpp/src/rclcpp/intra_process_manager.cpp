@@ -135,8 +135,6 @@ IntraProcessManager::remove_publisher(uint64_t intra_process_publisher_id)
   pub_to_generic_subs_.erase(intra_process_publisher_id);
 }
 
-}
-
 bool
 IntraProcessManager::matches_any_publishers(const rmw_gid_t * id) const
 {
