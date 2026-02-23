@@ -570,9 +570,8 @@ protected:
       static_cast<const void *>(publisher_handle_.get()),
       msg.get());
 
-    return ipm->template do_intra_process_publish_and_return_shared<ROSMessageType,
-        ROSMessageType,
-        AllocatorT>(
+    return ipm->template do_intra_process_publish_and_return_shared<ROSMessageType, ROSMessageType,
+             AllocatorT>(
       intra_process_publisher_id_,
       std::move(msg),
       ros_message_type_allocator_);
