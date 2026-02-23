@@ -320,6 +320,7 @@ SubscriptionBase::can_loan_messages() const
 rclcpp::Waitable::SharedPtr
 SubscriptionBase::get_intra_process_waitable() const
 {
+  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::get_intra_process_waitable"), "begin");
   // If not using intra process, shortcut to nullptr.
   if (!use_intra_process_) {
     return nullptr;
@@ -333,7 +334,9 @@ SubscriptionBase::get_intra_process_waitable() const
   }
 
   // Use the id to retrieve the subscription intra-process from the intra-process manager.
-  return ipm->get_subscription_intra_process(intra_process_subscription_id_);
+  auto ret = ipm->get_subscription_intra_process(intra_process_subscription_id_);
+  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::get_intra_process_waitable"), "end");
+  return ret;
 }
 
 void
@@ -364,6 +367,8 @@ SubscriptionBase::default_incompatible_type_callback(
 bool
 SubscriptionBase::matches_any_intra_process_publishers(const rmw_gid_t * sender_gid) const
 {
+  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::matches_any_intra_process_publishers"),
+    "begin");
   if (!use_intra_process_) {
     return false;
   }
@@ -373,7 +378,9 @@ SubscriptionBase::matches_any_intra_process_publishers(const rmw_gid_t * sender_
             "intra process publisher check called "
             "after destruction of intra process manager");
   }
-  return ipm->matches_any_publishers(sender_gid);
+  auto res = ipm->matches_any_publishers(sender_gid);
+  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::matches_any_intra_process_publishers"), "end");
+  return res;
 }
 
 bool

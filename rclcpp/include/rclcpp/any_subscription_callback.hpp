@@ -33,6 +33,7 @@
 #include "rclcpp/serialization.hpp"
 #include "rclcpp/serialized_message.hpp"
 #include "rclcpp/type_adapter.hpp"
+#include "rclcpp/logging.hpp"
 
 namespace rclcpp
 {
@@ -469,6 +470,7 @@ public:
     std::shared_ptr<ROSMessageType> message,
     const rclcpp::MessageInfo & message_info)
   {
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch(shared)"), "begin");
     TRACETOOLS_TRACEPOINT(callback_start, static_cast<const void *>(this), false);
     // Check if the variant is "unset", throw if it is.
     if (callback_variant_.index() == 0) {
@@ -561,6 +563,7 @@ public:
         }
       }, callback_variant_);
     TRACETOOLS_TRACEPOINT(callback_end, static_cast<const void *>(this));
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch(shared)"), "end");
   }
 
   // Dispatch when input is a serialized message and the output could be anything.
@@ -569,6 +572,7 @@ public:
     std::shared_ptr<const rclcpp::SerializedMessage> serialized_message,
     const rclcpp::MessageInfo & message_info)
   {
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch(ser)"), "begin");
     TRACETOOLS_TRACEPOINT(callback_start, static_cast<const void *>(this), false);
     // Check if the variant is "unset", throw if it is.
     if (callback_variant_.index() == 0) {
@@ -641,6 +645,7 @@ public:
         }
       }, callback_variant_);
     TRACETOOLS_TRACEPOINT(callback_end, static_cast<const void *>(this));
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch(ser)"), "end");
   }
 
   void
@@ -648,6 +653,8 @@ public:
     std::shared_ptr<const SubscribedType> message,
     const rclcpp::MessageInfo & message_info)
   {
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch_intra_process(shared)"),
+        "begin");
     TRACETOOLS_TRACEPOINT(callback_start, static_cast<const void *>(this), true);
     // Check if the variant is "unset", throw if it is.
     if (callback_variant_.index() == 0) {
@@ -771,6 +778,8 @@ public:
         }
       }, callback_variant_);
     TRACETOOLS_TRACEPOINT(callback_end, static_cast<const void *>(this));
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch_intra_process(shared)"),
+        "end");
   }
 
   void
@@ -778,6 +787,8 @@ public:
     std::unique_ptr<SubscribedType, SubscribedTypeDeleter> message,
     const rclcpp::MessageInfo & message_info)
   {
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch_intra_process(unique)"),
+        "begin");
     TRACETOOLS_TRACEPOINT(callback_start, static_cast<const void *>(this), true);
     // Check if the variant is "unset", throw if it is.
     if (callback_variant_.index() == 0) {
@@ -904,6 +915,8 @@ public:
           static_assert(detail::always_false_v<T>, "unhandled callback type");
         }
       }, callback_variant_);
+    RCLCPP_WARN(rclcpp::get_logger("AnySubscriptionCallback::dispatch_intra_process(unique)"),
+        "end");
     TRACETOOLS_TRACEPOINT(callback_end, static_cast<const void *>(this));
   }
 

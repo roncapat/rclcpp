@@ -357,6 +357,7 @@ public:
   void
   set_on_new_message_callback(std::function<void(size_t)> callback)
   {
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::set_on_new_message_callback"), "begin");
     if (!callback) {
       throw std::invalid_argument(
               "The callback passed to set_on_new_message_callback "
@@ -400,6 +401,7 @@ public:
       rclcpp::detail::cpp_callback_trampoline<
         decltype(on_new_message_callback_), const void *, size_t>,
       static_cast<const void *>(&on_new_message_callback_));
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::set_on_new_message_callback"), "end");
   }
 
   /// Unset the callback registered for new messages, if any.
@@ -435,6 +437,10 @@ public:
   void
   set_on_new_intra_process_message_callback(std::function<void(size_t)> callback)
   {
+    RCLCPP_WARN(
+      rclcpp::get_logger("SubscriptionBase::set_on_new_intra_process_message_callback"),
+      "begin");
+
     if (!use_intra_process_) {
       RCLCPP_WARN(
         rclcpp::get_logger("rclcpp"),
@@ -453,6 +459,9 @@ public:
     // We hide that detail to users of this method.
     std::function<void(size_t, int)> new_callback = std::bind(callback, std::placeholders::_1);
     subscription_intra_process_->set_on_ready_callback(new_callback);
+    RCLCPP_WARN(
+      rclcpp::get_logger("SubscriptionBase::set_on_new_intra_process_message_callback"),
+      "end");
   }
 
   /// Unset the callback registered for new intra-process messages, if any.

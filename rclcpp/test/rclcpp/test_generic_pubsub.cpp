@@ -40,10 +40,12 @@ class RclcppGenericNodeFixture : public Test
 public:
   RclcppGenericNodeFixture()
   {
-    node_ = std::make_shared<rclcpp::Node>("pubsub");
+    node_ = std::make_shared<rclcpp::Node>(
+      "pubsub",
+      rclcpp::NodeOptions().start_parameter_event_publisher(false).use_intra_process_comms(true));
     publisher_node_ = std::make_shared<rclcpp::Node>(
       "publisher_node",
-      rclcpp::NodeOptions().start_parameter_event_publisher(false));
+      rclcpp::NodeOptions().start_parameter_event_publisher(false).use_intra_process_comms(true));
   }
 
   static void SetUpTestCase()
@@ -66,21 +68,33 @@ public:
   std::vector<T1> subscribe_raw_messages(
     size_t expected_recv_msg_count, const std::string & topic_name, const std::string & type)
   {
+    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "begin");
     std::vector<T1> messages;
     size_t counter = 0;
     auto subscription = node_->create_generic_subscription(
       topic_name, type, rclcpp::QoS(1),
       [&counter, &messages, this](const std::shared_ptr<const rclcpp::SerializedMessage> message) {
+        RCLCPP_WARN(rclcpp::get_logger("======================================"), "begin");
         T2 deserialized_message;
         rclcpp::Serialization<T2> serializer;
         serializer.deserialize_message(message.get(), &deserialized_message);
         messages.push_back(this->get_data_from_msg(deserialized_message));
         counter++;
+        RCLCPP_ERROR(rclcpp::get_logger("====================================="), " ");
+        RCLCPP_WARN(rclcpp::get_logger("======================================"), "end");
       });
 
     while (counter < expected_recv_msg_count) {
+      RCLCPP_WARN_THROTTLE(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"),
+        *(this->node_->get_clock()),
+        5000,
+        "spinning...");
+      //rclcpp::spin_some(publisher_node_);
       rclcpp::spin_some(node_);
     }
+    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"),
+      "expected_recv_msg_count reached");
+    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "end");
     return messages;
   }
 
@@ -172,7 +186,52 @@ TEST_F(RclcppGenericNodeFixture, publisher_and_subscriber_work)
   ASSERT_TRUE(success);
 
   for (const auto & message : test_messages) {
-    publisher->publish(serialize_message<std::string, test_msgs::msg::Strings>(message));
+    auto ser_msg = serialize_message<std::string, test_msgs::msg::Strings>(message);
+    std::unique_ptr<rclcpp::SerializedMessage> u_ser_msg;
+    std::shared_ptr<rclcpp::SerializedMessage> s_ser_msg;
+    publisher->publish(ser_msg);
+  }
+
+  auto subscribed_messages = subscriber_future_.get();
+  EXPECT_THAT(subscribed_messages, SizeIs(Not(0)));
+  EXPECT_THAT(subscribed_messages[0], StrEq("Hello World"));
+}
+
+TEST_F(RclcppGenericNodeFixture, publisher_and_subscriber_intra)
+{
+  // We currently publish more messages because they can get lost
+  std::vector<std::string> test_messages = {"Hello World", "Hello World"};
+  std::string topic_name = "/string_topic_intra";
+  std::string type = "test_msgs/msg/Strings";
+
+  auto publisher = node_->create_publisher<test_msgs::msg::Strings>(topic_name, rclcpp::QoS(1));
+
+  auto subscriber_future_ = std::async(
+    std::launch::async, [this, topic_name, type] {
+      return subscribe_raw_messages<std::string, test_msgs::msg::Strings>(1, topic_name, type);
+    });
+
+  // TODO(karsten1987): Port 'wait_for_sub' to rclcpp
+  auto allocator = node_->get_node_options().allocator();
+  auto success = false;
+  auto ret = rcl_wait_for_subscribers(
+    node_->get_node_base_interface()->get_rcl_node_handle(),
+    &allocator,
+    topic_name.c_str(),
+    1u,
+    static_cast<rcutils_duration_value_t>(1e9),  // timeout in ns
+    &success);
+  ASSERT_EQ(RCL_RET_OK, ret) << rcl_get_error_string().str;
+  ASSERT_TRUE(success);
+  RCLCPP_WARN(rclcpp::get_logger("test"), "out from rcl_wait_for_subscribers");
+
+  for (const auto & message : test_messages) {
+    auto msg1 = std::make_unique<test_msgs::msg::Strings>();
+    msg1->string_value = message;
+    publisher->publish(std::move(msg1));
+    test_msgs::msg::Strings msg2;
+    msg2.string_value = message;
+    publisher->publish(msg2);
   }
 
   auto subscribed_messages = subscriber_future_.get();
