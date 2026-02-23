@@ -131,10 +131,6 @@ public:
     std::shared_ptr<rclcpp::SubscriptionBase> subscription,
     rclcpp::SubscriptionWaitSetMask mask = {})
   {
-    auto clock = rclcpp::Clock();
-    RCLCPP_WARN_THROTTLE(rclcpp::get_logger("WaitSetTemplate::add_subscription"),
-    clock, 2500,
-    "begin");
     if (nullptr == subscription) {
       throw std::invalid_argument("subscription is nullptr");
     }
