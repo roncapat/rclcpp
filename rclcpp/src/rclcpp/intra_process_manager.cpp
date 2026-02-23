@@ -135,16 +135,6 @@ IntraProcessManager::remove_publisher(uint64_t intra_process_publisher_id)
   pub_to_generic_subs_.erase(intra_process_publisher_id);
 }
 
-std::ostream &
-operator<<(std::ostream & ostream, const rmw_gid_t & gid)
-{
-  ostream << std::hex;
-  size_t i = 0;
-  for (; i < (RMW_GID_STORAGE_SIZE - 1); i++) {
-    ostream << static_cast<int>(gid.data[i]) << ".";
-  }
-  ostream << static_cast<int>(gid.data[i]);
-  return ostream << std::dec;
 }
 
 bool
