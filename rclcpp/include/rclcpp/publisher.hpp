@@ -456,7 +456,6 @@ protected:
   void
   do_inter_process_publish(const ROSMessageType & msg)
   {
-
     TRACETOOLS_TRACEPOINT(rclcpp_publish, nullptr, static_cast<const void *>(&msg));
     auto status = rcl_publish(publisher_handle_.get(), &msg, nullptr);
 
