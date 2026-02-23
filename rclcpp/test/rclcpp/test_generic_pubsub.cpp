@@ -174,7 +174,7 @@ TEST_F(RclcppGenericNodeFixture, publisher_and_subscriber_work)
   ASSERT_TRUE(success);
 
   for (const auto & message : test_messages) {
-publisher->publish(serialize_message<std::string, test_msgs::msg::Strings>(message));
+    publisher->publish(serialize_message<std::string, test_msgs::msg::Strings>(message));
   }
 
   auto subscribed_messages = subscriber_future_.get();
