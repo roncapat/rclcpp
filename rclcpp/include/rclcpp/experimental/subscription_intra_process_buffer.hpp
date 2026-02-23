@@ -160,17 +160,25 @@ public:
   void
   provide_intra_process_data(ConstDataSharedPtr message)
   {
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(shared)"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(shared)"),
+    "topic: %s", this->get_topic_name());
     buffer_->add_shared(std::move(message));
     trigger_guard_condition();
     this->invoke_on_new_message();
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(shared)"), "end");
   }
 
   void
   provide_intra_process_data(SubscribedTypeUniquePtr message)
   {
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(unique)"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(unique)"),
+    "topic: %s", this->get_topic_name());
     buffer_->add_unique(std::move(message));
     trigger_guard_condition();
     this->invoke_on_new_message();
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::provide_intra_process_data(unique)"), "end");
   }
 
   bool
@@ -188,7 +196,9 @@ protected:
   void
   trigger_guard_condition() override
   {
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::trigger_guard_condition"), "begin");
     this->gc_.trigger();
+    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBuffer::trigger_guard_condition"), "end");
   }
 
   BufferUniquePtr buffer_;

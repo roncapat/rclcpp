@@ -241,6 +241,7 @@ public:
   >
   publish(std::unique_ptr<T, ROSMessageTypeDeleter> msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_1"), "begin");
     if (!intra_process_is_enabled_) {
       this->do_inter_process_publish(*msg);
       return;
@@ -264,7 +265,7 @@ public:
       if (buffer_) {
         buffer_->add_shared(shared_msg);
       }
-      this->do_inter_process_publish(*shared_msg);
+      this->do_inter_process_publish(*shared_msg); // FAILS HERE
     } else {
       if (buffer_) {
         auto shared_msg =
@@ -274,6 +275,7 @@ public:
         this->do_intra_process_ros_message_publish(std::move(msg));
       }
     }
+  RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_1"), "end");
   }
 
   /// Publish a message on the topic.
@@ -295,6 +297,7 @@ public:
   >
   publish(const T & msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(T)"), "begin");
     // Avoid allocating when not using intra process.
     if (!intra_process_is_enabled_) {
       this->do_inter_process_publish(msg);
@@ -305,6 +308,7 @@ public:
     // A shared_ptr<const MessageT> could also be constructed here.
     auto unique_msg = this->duplicate_ros_message_as_unique_ptr(msg);
     this->publish(std::move(unique_msg));
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(T)"), "end");
   }
 
   /// Publish a message on the topic.
@@ -325,6 +329,8 @@ public:
   >
   publish(std::unique_ptr<T, PublishedTypeDeleter> msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_2"), "begin");
+
     if (!intra_process_is_enabled_) {
       // In this case we're not using intra process.
       auto ros_msg_ptr = std::make_unique<ROSMessageType>();
@@ -355,6 +361,7 @@ public:
       }
       this->do_intra_process_publish(std::move(msg));
     }
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_2"), "end");
   }
 
   /// Publish a message on the topic.
@@ -375,6 +382,7 @@ public:
   >
   publish(const T & msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(T)"), "begin");
     if (!intra_process_is_enabled_) {
       // Convert to the ROS message equivalent and publish it.
       auto ros_msg_ptr = std::make_unique<ROSMessageType>();
@@ -388,6 +396,7 @@ public:
     // A shared_ptr<const MessageT> could also be constructed here.
     auto unique_msg = this->duplicate_type_adapt_message_as_unique_ptr(msg);
     this->publish(std::move(unique_msg));
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(T)"), "end");
   }
 
   void
@@ -456,8 +465,11 @@ protected:
   void
   do_inter_process_publish(const ROSMessageType & msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_inter_process_publish"), "begin");
+
     TRACETOOLS_TRACEPOINT(rclcpp_publish, nullptr, static_cast<const void *>(&msg));
     auto status = rcl_publish(publisher_handle_.get(), &msg, nullptr);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_inter_process_publish"), "after rcl_publish: %d", status);
 
     if (RCL_RET_PUBLISHER_INVALID == status) {
       rcl_reset_error();  // next call will reset error message if not context
@@ -472,6 +484,7 @@ protected:
     if (RCL_RET_OK != status) {
       rclcpp::exceptions::throw_from_rcl_error(status, "failed to publish message");
     }
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_inter_process_publish"), "end");
   }
 
   void
@@ -512,6 +525,7 @@ protected:
   void
   do_intra_process_publish(std::unique_ptr<PublishedType, PublishedTypeDeleter> msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_1"), "begin");
     auto ipm = weak_ipm_.lock();
     if (!ipm) {
       throw std::runtime_error(
@@ -529,11 +543,14 @@ protected:
       intra_process_publisher_id_,
       std::move(msg),
       published_type_allocator_);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_1"), "end");
   }
 
   void
   do_intra_process_ros_message_publish(std::unique_ptr<ROSMessageType, ROSMessageTypeDeleter> msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"), "Publisher ID: %ld", intra_process_publisher_id_);
     auto ipm = weak_ipm_.lock();
     if (!ipm) {
       throw std::runtime_error(
@@ -551,12 +568,14 @@ protected:
       intra_process_publisher_id_,
       std::move(msg),
       ros_message_type_allocator_);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"), "end");
   }
 
   std::shared_ptr<const ROSMessageType>
   do_intra_process_ros_message_publish_and_return_shared(
     std::unique_ptr<ROSMessageType, ROSMessageTypeDeleter> msg)
   {
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "begin");
     auto ipm = weak_ipm_.lock();
     if (!ipm) {
       throw std::runtime_error(
@@ -570,11 +589,13 @@ protected:
       static_cast<const void *>(publisher_handle_.get()),
       msg.get());
 
-    return ipm->template do_intra_process_publish_and_return_shared<ROSMessageType, ROSMessageType,
+    auto ret = ipm->template do_intra_process_publish_and_return_shared<ROSMessageType, ROSMessageType,
              AllocatorT>(
       intra_process_publisher_id_,
       std::move(msg),
       ros_message_type_allocator_);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "end");
+    return ret;
   }
 
 

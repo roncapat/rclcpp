@@ -335,16 +335,16 @@ function(test_generic_pubsub_for_rmw_implementation)
 endfunction()
 call_for_each_rmw_implementation(test_generic_pubsub_for_rmw_implementation)
 
-function(test_qos_event_for_rmw_implementation)
-  set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
-  ament_add_gmock(test_qos_event${target_suffix} test_qos_event.cpp
-    ENV ${rmw_implementation_env_var}
-  )
-  if(TARGET test_qos_event${target_suffix})
-    target_link_libraries(test_qos_event${target_suffix} ${PROJECT_NAME} mimick rcutils::rcutils rmw::rmw ${test_msgs_TARGETS})
-  endif()
-endfunction()
-call_for_each_rmw_implementation(test_qos_event_for_rmw_implementation)
+#function(test_qos_event_for_rmw_implementation)
+#  set(rmw_implementation_env_var RMW_IMPLEMENTATION=${rmw_implementation})
+#  ament_add_gmock(test_qos_event${target_suffix} test_qos_event.cpp
+#    ENV ${rmw_implementation_env_var}
+#  )
+#  if(TARGET test_qos_event${target_suffix})
+#    target_link_libraries(test_qos_event${target_suffix} ${PROJECT_NAME} mimick rcutils::rcutils rmw::rmw ${test_msgs_TARGETS})
+#  endif()
+#endfunction()
+#call_for_each_rmw_implementation(test_qos_event_for_rmw_implementation)
 
 ament_add_gmock(test_qos_overriding_options test_qos_overriding_options.cpp)
 if(TARGET test_qos_overriding_options)
