@@ -141,10 +141,6 @@ bool
 IntraProcessManager::matches_any_publishers(const rmw_gid_t * id) const
 {
   std::shared_lock<std::shared_timed_mutex> lock(mutex_);
-  RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("IntraProcessManager::matches_any_publishers"),
-      "intra-process publishers to be checked: " << publishers_.size()
-  );
 
   for (auto & publisher_pair : publishers_) {
     auto publisher = publisher_pair.second.lock();
