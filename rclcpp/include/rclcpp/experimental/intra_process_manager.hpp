@@ -121,9 +121,9 @@ public:
   add_subscription(rclcpp::experimental::SubscriptionIntraProcessBase::SharedPtr subscription)
   {
     RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_subscription"), "begin");
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_subscription"), 
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_subscription"),
       "ROSMessageType = %s", typeid(ROSMessageType).name());
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_subscription"), 
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_subscription"),
       "topic = %s", subscription->get_topic_name());
 
     std::unique_lock<std::shared_timed_mutex> lock(mutex_);
@@ -160,12 +160,13 @@ public:
     typename Alloc = std::allocator<ROSMessageType>
   >
   uint64_t
-  add_generic_subscription(rclcpp::experimental::SubscriptionIntraProcessBase::SharedPtr subscription)
+  add_generic_subscription(
+    rclcpp::experimental::SubscriptionIntraProcessBase::SharedPtr subscription)
   {
     RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"), "begin");
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"), 
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"),
       "ROSMessageType = %s", typeid(ROSMessageType).name());
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"), 
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"),
       "topic = %s", subscription->get_topic_name());
 
     std::unique_lock<std::shared_timed_mutex> lock(mutex_);
@@ -194,7 +195,8 @@ public:
       }
     }
 
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"), "subscription ID: %ld", sub_id);
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"),
+          "subscription ID: %ld", sub_id);
     RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_generic_subscription"), "end");
     return sub_id;
   }
@@ -278,7 +280,8 @@ public:
     typename allocator::AllocRebind<MessageT, Alloc>::allocator_type & allocator)
   {
     RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish"), "begin");
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish"), "publisher ID: %ld", intra_process_publisher_id);
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish"),
+          "publisher ID: %ld", intra_process_publisher_id);
     using MessageAllocTraits = allocator::AllocRebind<MessageT, Alloc>;
     using MessageAllocatorT = typename MessageAllocTraits::allocator_type;
 
@@ -441,7 +444,8 @@ public:
     std::unique_ptr<MessageT, Deleter> message,
     typename allocator::AllocRebind<MessageT, Alloc>::allocator_type & allocator)
   {
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish_and_return_shared"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger(
+          "IntraProcessManager::do_intra_process_publish_and_return_shared"), "begin");
     using MessageAllocTraits = allocator::AllocRebind<MessageT, Alloc>;
     using MessageAllocatorT = typename MessageAllocTraits::allocator_type;
 
@@ -460,21 +464,24 @@ public:
       using ROSMessageTypeDeleter = allocator::Deleter<ROSMessageTypeAllocator, ROSMessageType>;
       GAlloc gallocator;
 
-      if (sub_ids.take_ownership_subscriptions.empty()) {        
+      if (sub_ids.take_ownership_subscriptions.empty()) {
         rclcpp::Serialization<ROSMessageType> serializer;
         auto ser_msg = std::make_shared<rclcpp::SerializedMessage>();
-        
+
         if constexpr (rclcpp::TypeAdapter<MessageT, ROSMessageType>::is_specialized::value) {
-          RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish_and_return_shared"), "A");
+          RCLCPP_WARN(rclcpp::get_logger(
+                "IntraProcessManager::do_intra_process_publish_and_return_shared"), "A");
           ROSMessageTypeAllocator ros_message_alloc(allocator);
           auto ptr = ROSMessageTypeAllocatorTraits::allocate(ros_message_alloc, 1);
           ROSMessageTypeAllocatorTraits::construct(ros_message_alloc, ptr);
           ROSMessageTypeDeleter deleter;
           allocator::set_allocator_for_deleter(&deleter, &allocator);
-          rclcpp::TypeAdapter<MessageT, ROSMessageType>::convert_to_ros_message(message.get(), *ptr);
+          rclcpp::TypeAdapter<MessageT, ROSMessageType>::convert_to_ros_message(message.get(),
+                *ptr);
           serializer.serialize_message(ptr, ser_msg.get());
         } else {
-          RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish_and_return_shared"), "B");
+          RCLCPP_WARN(rclcpp::get_logger(
+                "IntraProcessManager::do_intra_process_publish_and_return_shared"), "B");
           serializer.serialize_message(message.get(), ser_msg.get());
         }
 
@@ -487,17 +494,20 @@ public:
         auto ser_msg = std::make_shared<rclcpp::SerializedMessage>();
         auto ser_msg_u = std::make_unique<rclcpp::SerializedMessage>();
         if constexpr (rclcpp::TypeAdapter<MessageT, ROSMessageType>::is_specialized::value) {
-          RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish_and_return_shared"), "C");
+          RCLCPP_WARN(rclcpp::get_logger(
+                "IntraProcessManager::do_intra_process_publish_and_return_shared"), "C");
           ROSMessageTypeAllocator ros_message_alloc(allocator);
           auto ptr = ROSMessageTypeAllocatorTraits::allocate(ros_message_alloc, 1);
           ROSMessageTypeAllocatorTraits::construct(ros_message_alloc, ptr);
           ROSMessageTypeDeleter deleter;
           allocator::set_allocator_for_deleter(&deleter, &allocator);
-          rclcpp::TypeAdapter<MessageT, ROSMessageType>::convert_to_ros_message(message.get(), *ptr);
+          rclcpp::TypeAdapter<MessageT, ROSMessageType>::convert_to_ros_message(message.get(),
+                *ptr);
           serializer.serialize_message(ptr, ser_msg.get());
           serializer.serialize_message(ptr, ser_msg_u.get());
         } else {
-          RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::do_intra_process_publish_and_return_shared"), "D");
+          RCLCPP_WARN(rclcpp::get_logger(
+                "IntraProcessManager::do_intra_process_publish_and_return_shared"), "D");
           serializer.serialize_message(message.get(), ser_msg.get());
           serializer.serialize_message(message.get(), ser_msg_u.get());
         }
@@ -758,7 +768,7 @@ private:
         }
       }
     }
-  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_buffers"), "end");
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_buffers"), "end");
   }
 
   template<
@@ -872,7 +882,8 @@ private:
     std::shared_ptr<const rclcpp::SerializedMessage> message,
     std::vector<uint64_t> subscription_ids)
   {
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_generic_buffers"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_generic_buffers"),
+          "begin");
     /*
     using ROSMessageTypeAllocatorTraits = allocator::AllocRebind<ROSMessageType, Alloc>;
     using ROSMessageTypeAllocator = typename ROSMessageTypeAllocatorTraits::allocator_type;
@@ -939,7 +950,8 @@ private:
       ros_message_subscription->provide_intra_process_message(message);
       */
     }
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_generic_buffers"), "end");
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_shared_msg_to_generic_buffers"),
+          "end");
   }
 
   template<
@@ -952,7 +964,8 @@ private:
     std::vector<uint64_t> subscription_ids,
     typename allocator::AllocRebind<rclcpp::SerializedMessage, Alloc>::allocator_type & allocator)
   {
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_owned_msg_to_generic_buffers"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_owned_msg_to_generic_buffers"),
+          "begin");
     using MessageT = rclcpp::SerializedMessage;
     using MessageAllocTraits = allocator::AllocRebind<MessageT, Alloc>;
     using MessageUniquePtr = std::unique_ptr<MessageT, Deleter>;
@@ -1041,7 +1054,6 @@ private:
     }
     RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::add_owned_msg_to_generic_buffers"), "end");
   }
-
 
 
   PublisherToSubscriptionIdsMap pub_to_subs_;

@@ -154,8 +154,8 @@ IntraProcessManager::matches_any_publishers(const rmw_gid_t * id) const
   RCLCPP_WARN_STREAM(
       rclcpp::get_logger("IntraProcessManager::matches_any_publishers"),
       "intra-process publishers to be checked: " << publishers_.size()
-    );
-    
+  );
+
   for (auto & publisher_pair : publishers_) {
     auto publisher = publisher_pair.second.lock();
     if (!publisher) {
@@ -165,13 +165,15 @@ IntraProcessManager::matches_any_publishers(const rmw_gid_t * id) const
     RCLCPP_WARN_STREAM(
         rclcpp::get_logger("IntraProcessManager::matches_any_publishers"),
         "\nID  " << *id << "\nPUB " << publisher.get()->get_gid();
-      );
+    );
     if (*publisher.get() == id) {
-      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::matches_any_publishers"), "matches_any_publishers=true");
+      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::matches_any_publishers"),
+            "matches_any_publishers=true");
       return true;
     }
   }
-    RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::matches_any_publishers"), "matches_any_publishers=false");
+  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::matches_any_publishers"),
+        "matches_any_publishers=false");
   return false;
 }
 
@@ -179,7 +181,8 @@ size_t
 IntraProcessManager::get_subscription_count(uint64_t intra_process_publisher_id) const
 {
   RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"), "begin");
-  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"), "Publisher ID: %ld", intra_process_publisher_id);
+  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"),
+        "Publisher ID: %ld", intra_process_publisher_id);
   std::shared_lock<std::shared_timed_mutex> lock(mutex_);
 
   size_t count = 0;
@@ -194,16 +197,17 @@ IntraProcessManager::get_subscription_count(uint64_t intra_process_publisher_id)
     return 0;
   }
 
-  if (publisher_it != pub_to_subs_.end()){
+  if (publisher_it != pub_to_subs_.end()) {
     count += publisher_it->second.take_shared_subscriptions.size();
     count += publisher_it->second.take_ownership_subscriptions.size();
   }
 
-  if (publisher_g_it != pub_to_generic_subs_.end()){
+  if (publisher_g_it != pub_to_generic_subs_.end()) {
     count += publisher_g_it->second.take_shared_subscriptions.size();
     count += publisher_g_it->second.take_ownership_subscriptions.size();
   }
-  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"), "count = %ld", count);
+  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"), "count = %ld",
+        count);
   RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_count"), "end");
   return count;
 }
@@ -212,25 +216,31 @@ SubscriptionIntraProcessBase::SharedPtr
 IntraProcessManager::get_subscription_intra_process(uint64_t intra_process_subscription_id)
 {
   RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "begin");
-  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "subscription ID: %ld", intra_process_subscription_id);
+  RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+        "subscription ID: %ld", intra_process_subscription_id);
   std::shared_lock<std::shared_timed_mutex> lock(mutex_);
 
   auto subscription_it = subscriptions_.find(intra_process_subscription_id);
   auto subscription_g_it = generic_subscriptions_.find(intra_process_subscription_id);
-  if (subscription_it == subscriptions_.end() && subscription_g_it == generic_subscriptions_.end()) {
-    RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "nullptr");
+  if (subscription_it == subscriptions_.end() &&
+    subscription_g_it == generic_subscriptions_.end())
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+          "nullptr");
     return nullptr;
   }
-  
+
   if (subscription_it != subscriptions_.end()) {
     auto subscription = subscription_it->second.lock();
     if (subscription) {
-      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "normal subscription found");
+      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+            "normal subscription found");
       RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "end");
       return subscription;
     } else {
       subscriptions_.erase(subscription_it);
-      RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "nullptr");
+      RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+            "nullptr");
       return nullptr;
     }
   }
@@ -238,17 +248,20 @@ IntraProcessManager::get_subscription_intra_process(uint64_t intra_process_subsc
   if (subscription_g_it != generic_subscriptions_.end()) {
     auto subscription = subscription_g_it->second.lock();
     if (subscription) {
-      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "generic subscription found");
+      RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+            "generic subscription found");
       RCLCPP_WARN(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "end");
       return subscription;
     } else {
       generic_subscriptions_.erase(subscription_g_it);
-      RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "nullptr");
+      RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+            "nullptr");
       return nullptr;
     }
   }
 
-  RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"), "nullptr");
+  RCLCPP_ERROR(rclcpp::get_logger("IntraProcessManager::get_subscription_intra_process"),
+        "nullptr");
   return nullptr;
 }
 
@@ -337,15 +350,15 @@ IntraProcessManager::lowest_available_capacity(const uint64_t intra_process_publ
   bool b = false;
   if (publisher_it != pub_to_subs_.end()) {
     a = publisher_it->second.take_shared_subscriptions.empty() &&
-    publisher_it->second.take_ownership_subscriptions.empty();
+      publisher_it->second.take_ownership_subscriptions.empty();
   }
 
   if (publisher_g_it != pub_to_generic_subs_.end()) {
     b = publisher_g_it->second.take_shared_subscriptions.empty() &&
-    publisher_g_it->second.take_ownership_subscriptions.empty();
+      publisher_g_it->second.take_ownership_subscriptions.empty();
   }
 
-  if (a || b) {
+  if (!(a || b)) {
     // no subscriptions available
     return 0u;
   }

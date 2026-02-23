@@ -275,7 +275,7 @@ public:
         this->do_intra_process_ros_message_publish(std::move(msg));
       }
     }
-  RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_1"), "end");
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::publish(unique)_1"), "end");
   }
 
   /// Publish a message on the topic.
@@ -469,7 +469,8 @@ protected:
 
     TRACETOOLS_TRACEPOINT(rclcpp_publish, nullptr, static_cast<const void *>(&msg));
     auto status = rcl_publish(publisher_handle_.get(), &msg, nullptr);
-    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_inter_process_publish"), "after rcl_publish: %d", status);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_inter_process_publish"), "after rcl_publish: %d",
+        status);
 
     if (RCL_RET_PUBLISHER_INVALID == status) {
       rcl_reset_error();  // next call will reset error message if not context
@@ -550,7 +551,8 @@ protected:
   do_intra_process_ros_message_publish(std::unique_ptr<ROSMessageType, ROSMessageTypeDeleter> msg)
   {
     RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"), "begin");
-    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"), "Publisher ID: %ld", intra_process_publisher_id_);
+    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_publish(unique)_2"),
+        "Publisher ID: %ld", intra_process_publisher_id_);
     auto ipm = weak_ipm_.lock();
     if (!ipm) {
       throw std::runtime_error(
@@ -575,7 +577,8 @@ protected:
   do_intra_process_ros_message_publish_and_return_shared(
     std::unique_ptr<ROSMessageType, ROSMessageTypeDeleter> msg)
   {
-    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "begin");
+    RCLCPP_WARN(rclcpp::get_logger(
+        "Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "begin");
     auto ipm = weak_ipm_.lock();
     if (!ipm) {
       throw std::runtime_error(
@@ -589,12 +592,14 @@ protected:
       static_cast<const void *>(publisher_handle_.get()),
       msg.get());
 
-    auto ret = ipm->template do_intra_process_publish_and_return_shared<ROSMessageType, ROSMessageType,
-             AllocatorT>(
+    auto ret = ipm->template do_intra_process_publish_and_return_shared<ROSMessageType,
+        ROSMessageType,
+        AllocatorT>(
       intra_process_publisher_id_,
       std::move(msg),
       ros_message_type_allocator_);
-    RCLCPP_WARN(rclcpp::get_logger("Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "end");
+    RCLCPP_WARN(rclcpp::get_logger(
+        "Publisher::do_intra_process_ros_message_publish_and_return_shared(unique)"), "end");
     return ret;
   }
 

@@ -334,7 +334,7 @@ SubscriptionBase::get_intra_process_waitable() const
   }
 
   // Use the id to retrieve the subscription intra-process from the intra-process manager.
-  auto ret =  ipm->get_subscription_intra_process(intra_process_subscription_id_);
+  auto ret = ipm->get_subscription_intra_process(intra_process_subscription_id_);
   RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::get_intra_process_waitable"), "end");
   return ret;
 }
@@ -367,7 +367,8 @@ SubscriptionBase::default_incompatible_type_callback(
 bool
 SubscriptionBase::matches_any_intra_process_publishers(const rmw_gid_t * sender_gid) const
 {
-  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::matches_any_intra_process_publishers"), "begin");
+  RCLCPP_WARN(rclcpp::get_logger("SubscriptionBase::matches_any_intra_process_publishers"),
+    "begin");
   if (!use_intra_process_) {
     return false;
   }

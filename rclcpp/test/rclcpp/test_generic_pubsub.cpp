@@ -92,7 +92,8 @@ public:
       //rclcpp::spin_some(publisher_node_);
       rclcpp::spin_some(node_);
     }
-    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "expected_recv_msg_count reached");
+    RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"),
+      "expected_recv_msg_count reached");
     RCLCPP_WARN(rclcpp::get_logger("RclcppGenericNodeFixture::subscribe_raw_messages"), "end");
     return messages;
   }

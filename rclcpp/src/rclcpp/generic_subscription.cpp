@@ -57,12 +57,14 @@ GenericSubscription::handle_serialized_message(
     // In this case, the message will be delivered via intra process and
     // we should ignore this copy of the message.
     RCLCPP_WARN(
-      rclcpp::get_logger("GenericSubscription::handle_serialized_message"), "matches intra-process sub");
+      rclcpp::get_logger("GenericSubscription::handle_serialized_message"),
+        "matches intra-process sub");
     RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::handle_serialized_message"), "end");
     return;
   }
 
-  RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::handle_serialized_message"), "No match with any intra-process pub");
+  RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::handle_serialized_message"),
+      "No match with any intra-process pub");
   any_callback_.dispatch(message, message_info);
   RCLCPP_WARN(rclcpp::get_logger("GenericSubscription::handle_serialized_message"), "end");
 }
