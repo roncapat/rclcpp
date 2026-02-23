@@ -205,17 +205,10 @@ public:
     return false;
   }
 
-  const rmw_gid_t &
-  get_gid() const
-  {
-    return rmw_gid_;
-  }
-
   rclcpp::QoS qos_profile;
   std::string topic_name;
   uint64_t intra_process_publisher_id_;
   IntraProcessManagerWeakPtr weak_ipm_;
-  rmw_gid_t rmw_gid_;
 };
 
 template<typename T, typename Alloc = std::allocator<void>>

@@ -130,8 +130,6 @@ public:
   void
   set_on_ready_callback(std::function<void(size_t, int)> callback) override
   {
-    RCLCPP_ERROR(rclcpp::get_logger("SubscriptionIntraProcessBase::set_on_ready_callback"),
-          "begin");
     if (!callback) {
       throw std::invalid_argument(
               "The callback passed to set_on_ready_callback "
@@ -172,8 +170,6 @@ public:
       }
       unread_count_ = 0;
     }
-
-    RCLCPP_ERROR(rclcpp::get_logger("SubscriptionIntraProcessBase::set_on_ready_callback"), "end");
   }
 
   /// Unset the callback registered for new messages, if any.
@@ -196,17 +192,12 @@ protected:
   void
   invoke_on_new_message()
   {
-    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBase::invoke_on_new_message"), "begin");
     std::lock_guard<std::recursive_mutex> lock(this->callback_mutex_);
     if (this->on_new_message_callback_) {
-      RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBase::invoke_on_new_message"),
-            "calling on_trigger_callback_");
       this->on_new_message_callback_(1);
     } else {
-      RCLCPP_ERROR(rclcpp::get_logger("GuardCondition::trigger"), "empty callback");
       this->unread_count_++;
     }
-    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcessBase::invoke_on_new_message"), "end");
   }
 
 private:

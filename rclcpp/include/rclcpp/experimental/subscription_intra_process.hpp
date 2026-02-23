@@ -166,7 +166,6 @@ protected:
   typename std::enable_if<!std::is_same<T, rcl_serialized_message_t>::value, void>::type
   execute_impl(const std::shared_ptr<void> & data)
   {
-    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcess::execute_impl"), "begin");
     if (nullptr == data) {
       return;
     }
@@ -186,7 +185,6 @@ protected:
       any_callback_.dispatch_intra_process(std::move(unique_msg), msg_info);
     }
     shared_ptr.reset();
-    RCLCPP_WARN(rclcpp::get_logger("SubscriptionIntraProcess::execute_impl"), "end");
   }
 
   AnySubscriptionCallback<MessageT, Alloc> any_callback_;
