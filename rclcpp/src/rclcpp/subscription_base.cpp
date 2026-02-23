@@ -333,8 +333,7 @@ SubscriptionBase::get_intra_process_waitable() const
   }
 
   // Use the id to retrieve the subscription intra-process from the intra-process manager.
-  auto ret = ipm->get_subscription_intra_process(intra_process_subscription_id_);
-  return ret;
+  return ipm->get_subscription_intra_process(intra_process_subscription_id_);
 }
 
 void
@@ -374,8 +373,7 @@ SubscriptionBase::matches_any_intra_process_publishers(const rmw_gid_t * sender_
             "intra process publisher check called "
             "after destruction of intra process manager");
   }
-  auto res = ipm->matches_any_publishers(sender_gid);
-  return res;
+  return ipm->matches_any_publishers(sender_gid);
 }
 
 bool

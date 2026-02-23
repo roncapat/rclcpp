@@ -264,7 +264,7 @@ public:
       if (buffer_) {
         buffer_->add_shared(shared_msg);
       }
-      this->do_inter_process_publish(*shared_msg); // FAILS HERE
+      this->do_inter_process_publish(*shared_msg);
     } else {
       if (buffer_) {
         auto shared_msg =
@@ -571,7 +571,7 @@ protected:
       static_cast<const void *>(publisher_handle_.get()),
       msg.get());
 
-    auto ret = ipm->template do_intra_process_publish_and_return_shared<ROSMessageType,
+    return ipm->template do_intra_process_publish_and_return_shared<ROSMessageType,
         ROSMessageType,
         AllocatorT>(
       intra_process_publisher_id_,
