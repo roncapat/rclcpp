@@ -33,7 +33,6 @@
 #include "rclcpp/serialization.hpp"
 #include "rclcpp/serialized_message.hpp"
 #include "rclcpp/type_adapter.hpp"
-#include "rclcpp/logging.hpp"
 
 namespace rclcpp
 {
