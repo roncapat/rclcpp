@@ -209,7 +209,6 @@ public:
   std::string topic_name;
   uint64_t intra_process_publisher_id_;
   IntraProcessManagerWeakPtr weak_ipm_;
-  rmw_gid_t rmw_gid_;
 };
 
 template<typename T, typename Alloc = std::allocator<void>>
